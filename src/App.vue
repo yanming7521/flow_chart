@@ -8,11 +8,14 @@
 
 <script>
 import HelloWorld from "./components/FlowView.vue";
-
+import { consoleLog } from "@/utils/log";
 export default {
   name: "App",
   components: {
     HelloWorld,
+  },
+  mounted() {
+    consoleLog();
   },
 };
 </script>

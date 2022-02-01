@@ -76,7 +76,7 @@
             autocomplete="off"
           ></el-input>
         </el-form-item>
-        <el-form-item label="选择节点:" :label-width="formLabelWidth">
+        <!-- <el-form-item label="选择节点:" :label-width="formLabelWidth">
           <el-select
             v-model="form.id"
             placeholder="请选择"
@@ -90,7 +90,7 @@
             >
             </el-option>
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="taskVisible = false">取 消</el-button>
@@ -113,7 +113,14 @@
         drag-handle-selector=".column-drag-handle"
       >
         <Draggable v-for="(column, index) in taskColumnList" :key="column.name">
-          <div class="card-container" :class="{ columnSh: index === 0 }">
+          <div
+            class="card-container"
+            :class="{ columnSh: index === 0 }"
+            :style="{
+              backgroundColor: column.backgroundColor,
+              color: column.color,
+            }"
+          >
             <div class="card-column-header">
               <span class="column-drag-handle">&#x2630;</span>
               {{ column.name }}
@@ -151,7 +158,61 @@
         </Draggable>
       </Container>
     </div>
-    <div class="temp"></div>
+    <div
+      class="e-title"
+      style="width: calc(100% - 40px); text-align: left; padding: 10px 20px"
+    >
+      待分配节点&任务
+    </div>
+    <div class="temp">
+      <div
+        v-for="column in tempList"
+        :key="column.id"
+        style="margin: 15px 5px 15px 0"
+      >
+        <div
+          v-if="column.type == 'jd'"
+          class="card-container"
+          :class="{ columnSh: index === 0 }"
+          :style="{
+            backgroundColor: column.backgroundColor,
+            color: column.color,
+            marginRight: '20px',
+          }"
+        >
+          <div class="card-column-header">
+            <span class="column-drag-handle">&#x2630;</span>
+            {{ column.name }}
+            <span class="el-icon-error delete" @click="deleteJD(column)"></span>
+          </div>
+        </div>
+        <div
+          class="task-card"
+          :class="{ taskSh: index === 0 }"
+          style="margin: 0 10px"
+          v-if="column.type == 'task'"
+        >
+          <Container
+            group-name="col"
+            @drop="(e) => onCardDrop(column.id, e)"
+            :get-child-payload="getCardPayload(column.id)"
+            drag-class="card-ghost"
+            drop-class="card-ghost-drop"
+            :drop-placeholder="dropPlaceholderOptions"
+            class="draggable-container"
+          >
+            <Draggable>
+              <div class="task-title" style="padding: 0 10px">
+                {{ column.name
+                }}<span
+                  class="el-icon-close delete pos"
+                  @click="deletetask(column, column)"
+                ></span></div
+            ></Draggable>
+          </Container>
+        </div>
+      </div>
+    </div>
     <div class="foot">
       <div class="but">
         <el-button
@@ -191,14 +252,23 @@ const applyDrag = (arr, dragResult) => {
   }
   return result;
 };
-
+const colorList = [
+  { backgroundColor: "#ecf5ff", color: "#409EFF" },
+  { backgroundColor: "#f0f9eb", color: "#67C23A" },
+  { backgroundColor: "#f4f4f5", color: "#909399" },
+  { backgroundColor: "#f5dab1", color: "#E6A23C" },
+  { backgroundColor: "#fef0f0", color: "#F56C6C" },
+];
 export default {
   components: { Container, Draggable },
   data() {
     return {
+      tempList: [],
       taskColumnList: [
         {
           name: "日间申请",
+          backgroundColor: colorList[0].backgroundColor,
+          color: colorList[0].color,
           list: [
             {
               name: "入院信息登记",
@@ -210,6 +280,8 @@ export default {
         },
         {
           name: "日间登记",
+          backgroundColor: colorList[0].backgroundColor,
+          color: colorList[0].color,
           list: [
             {
               name: "办理预住院",
@@ -236,6 +308,8 @@ export default {
         },
         {
           name: "院前检查",
+          backgroundColor: colorList[0].backgroundColor,
+          color: colorList[0].color,
           list: [
             {
               name: "检验检查",
@@ -247,6 +321,8 @@ export default {
         },
         {
           name: "院前评估",
+          backgroundColor: colorList[0].backgroundColor,
+          color: colorList[0].color,
           list: [
             {
               name: "麻醉评估",
@@ -268,6 +344,8 @@ export default {
         },
         {
           name: "术前宣教",
+          backgroundColor: colorList[0].backgroundColor,
+          color: colorList[0].color,
           list: [
             {
               name: "用户宣教",
@@ -279,6 +357,8 @@ export default {
         },
         {
           name: "手术安排",
+          backgroundColor: colorList[0].backgroundColor,
+          color: colorList[0].color,
           list: [
             {
               name: "手术预约",
@@ -300,6 +380,8 @@ export default {
         },
         {
           name: "出入科",
+          backgroundColor: colorList[0].backgroundColor,
+          color: colorList[0].color,
           list: [
             {
               name: "麻醉复苏评估",
@@ -321,6 +403,8 @@ export default {
         },
         {
           name: "出院评估",
+          backgroundColor: colorList[0].backgroundColor,
+          color: colorList[0].color,
           list: [
             {
               name: "出院评估",
@@ -332,6 +416,8 @@ export default {
         },
         {
           name: "随访",
+          backgroundColor: colorList[0].backgroundColor,
+          color: colorList[0].color,
           list: [
             {
               name: "专科随访",
@@ -504,14 +590,17 @@ export default {
     addtask(form) {
       let temp = {
         name: form.name,
-        parent: this.taskColumnList.find((p) => p.id === form.id).name,
-        id: this.taskColumnList.find((p) => p.id === form.id).list.length
-          ? form.id +
-            "-" +
-            this.taskColumnList.find((p) => p.id === form.id).list.length
-          : form.id + "-" + 0,
+        id: Date.now(),
+        type: "task",
+        // parent: this.taskColumnList.find((p) => p.id === form.id).name,
+        // id: this.taskColumnList.find((p) => p.id === form.id).list.length
+        //   ? form.id +
+        //     "-" +
+        //     this.taskColumnList.find((p) => p.id === form.id).list.length
+        //   : form.id + "-" + 0,
       };
-      this.taskColumnList.find((p) => p.id === form.id).list.push(temp);
+      // this.taskColumnList.find((p) => p.id === form.id).list.push(temp);
+      this.tempList.push(temp);
       console.log("addtask--添加任务", this.taskColumnList);
       this.$message({
         showClose: true,
@@ -524,7 +613,15 @@ export default {
     // 添加节点
     addjd(form) {
       let id = Date.now();
-      this.taskColumnList.push({ name: form.name, list: [], id: id });
+      // this.taskColumnList.push({ name: form.name, list: [], id: id });
+      this.tempList.push({
+        type: "jd",
+        name: form.name,
+        list: [],
+        id: id,
+        backgroundColor: colorList[0].backgroundColor,
+        color: colorList[0].color,
+      });
       console.log("addjd--添加节点", this.taskColumnList);
       this.$message({
         showClose: true,
@@ -829,6 +926,7 @@ export default {
   justify-content: space-between;
   flex-shrink: 0;
   font-weight: 500;
+
   font-size: 16px;
 }
 .draggable-container {
@@ -916,9 +1014,13 @@ export default {
   cursor: pointer !important;
 }
 .temp {
-  background: #f2f6fc;
+  /* background: #edeff2; */
   min-height: 140px;
-  width: 100%;
+  width: calc(100% - 40px);
+  display: flex;
+  padding: 0 20px;
+  border-top: #edeff2 solid 1px;
+  flex-wrap: wrap;
 }
 .explain {
   position: absolute;
