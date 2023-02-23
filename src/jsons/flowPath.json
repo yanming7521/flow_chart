@@ -1,0 +1,134 @@
+[
+    {
+        "name": "入院登记",
+        "list": [
+            {
+                "name": "入院登记",
+                "priority": "P1",
+                "status": "入院登记",
+                "display": true,
+                "id": 1
+            }
+        ],
+        "id": 0
+    },
+    {
+        "name": "手术评估",
+        "list": [
+            {
+                "name": "麻醉评估",
+                "priority": "P3",
+                "status": "手术评估",
+                "display": true,
+                "id": 2
+            },
+            {
+                "name": "专科评估",
+                "priority": "P3",
+                "status": "手术评估",
+                "display": true,
+                "id": 4
+            },
+            {
+                "name": "中心评估",
+                "priority": "P3",
+                "status": "手术评估",
+                "display": true,
+                "id": 3
+            },
+            {
+                "name": "麻醉复苏评估",
+                "priority": "P1",
+                "status": "手术评估",
+                "display": true,
+                "id": 12
+            }
+        ],
+        "id": 1
+    },
+    {
+        "name": "手术预约",
+        "list": [
+            {
+                "name": "手术预约",
+                "priority": "P1",
+                "status": "手术预约",
+                "display": true,
+                "id": 5
+            }
+        ],
+        "id": 2
+    },
+    {
+        "name": "手术排程",
+        "list": [
+            {
+                "name": "手术排程",
+                "priority": "P3",
+                "status": "手术排程",
+                "display": true,
+                "id": 6
+            }
+        ],
+        "id": 3
+    },
+    {
+        "name": "入科",
+        "list": [
+            {
+                "name": "入科",
+                "priority": "P0",
+                "status": "入科",
+                "display": true,
+                "id": 7
+            }
+        ],
+        "id": 4
+    },
+    {
+        "name": "出科",
+        "list": [
+            {
+                "name": "出科",
+                "priority": "P1",
+                "status": "出科",
+                "display": true,
+                "id": 8
+            }
+        ],
+        "id": 5
+    },
+    {
+        "name": "办理出院",
+        "list": [
+            {
+                "name": "出院",
+                "priority": "P1",
+                "status": "办理出院",
+                "display": true,
+                "id": 9
+            }
+        ],
+        "id": 6
+    },
+    {
+        "name": "随访",
+        "list": [
+            {
+                "name": "中心随访",
+                "priority": "P1",
+                "status": "随访",
+                "display": true,
+                "id": 10
+            },
+            {
+                "name": "专科随访",
+                "priority": "P1",
+                "status": "随访",
+                "display": true,
+                "id": 11
+            }
+        ],
+        "id": 7
+    }
+]
