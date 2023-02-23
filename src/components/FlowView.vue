@@ -126,7 +126,9 @@
     </div>
     <div class="foot">
       <div class="but">
-        <el-button type="" style="margin-right: 40px">重 置</el-button>
+        <el-button type="" style="margin-right: 40px" @click="initialization()"
+          >重 置</el-button
+        >
         <el-button type="primary" @click="sive()">保 存</el-button>
       </div>
     </div>
@@ -134,24 +136,23 @@
 </template>
 
 <script>
+// 拖拽插件
 import { Container, Draggable } from "vue-smooth-dnd";
+// 下载文件
 import FileSaver from "file-saver";
 
+// 拖拽重构
 const applyDrag = (arr, dragResult) => {
   const { removedIndex, addedIndex, payload } = dragResult;
   if (removedIndex === null && addedIndex === null) return arr;
-
   const result = [...arr];
   let itemToAdd = payload;
-
   if (removedIndex !== null) {
     itemToAdd = result.splice(removedIndex, 1)[0];
   }
-
   if (addedIndex !== null) {
     result.splice(addedIndex, 0, itemToAdd);
   }
-
   return result;
 };
 
@@ -311,9 +312,10 @@ export default {
     };
   },
   mounted() {
-    console.log("mounted", this.taskColumnList);
+    // console.log("mounted", this.taskColumnList);
   },
   methods: {
+    // 添加任务
     addtask(form) {
       let temp = {
         name: form.name,
@@ -324,16 +326,21 @@ export default {
       };
       this.taskColumnList.find((p) => p.id === form.id).list.push(temp);
       console.log("addtask--添加任务", this.taskColumnList);
+      this.form = [];
     },
+    // 添加节点
     addjd(form) {
       let id = this.taskColumnList.length + 1;
       this.taskColumnList.push({ name: form.name, list: [], id: id });
       console.log("addjd--添加节点");
+      this.jdform = [];
     },
+    // 更新节点
     onColumnDrop(dropResult) {
       this.taskColumnList = applyDrag(this.taskColumnList, dropResult);
       console.log("onColumnDrop--更新节点", this.taskColumnList);
     },
+    // 更新任务
     onCardDrop(columnId, dropResult) {
       let { removedIndex, addedIndex, payload } = dropResult;
       if (removedIndex !== null || addedIndex !== null) {
@@ -348,16 +355,155 @@ export default {
         console.log("onCardDrop--更新任务", this.taskColumnList);
       }
     },
+    // 校验
     getCardPayload(columnId) {
       let index = (index) =>
         this.taskColumnList.find((p) => p.id === columnId).list[index];
       return index;
     },
+    // 保存
     sive() {
       let taskColumnListFile = JSON.stringify(this.taskColumnList);
       console.log("taskColumnListFile", taskColumnListFile);
       const blob = new Blob([taskColumnListFile], { type: "application/json" });
       FileSaver.saveAs(blob, `flowPath.json`);
+    },
+    // 重置&初始化
+    initialization() {
+      this.taskColumnList = [
+        {
+          name: "入院登记",
+          list: [
+            {
+              name: "入院登记",
+              priority: "P1",
+              status: "入院登记",
+              display: true,
+              id: 1,
+            },
+          ],
+          id: 0,
+        },
+        {
+          name: "手术评估",
+          list: [
+            {
+              name: "麻醉评估",
+              priority: "P3",
+              status: "手术评估",
+              display: true,
+              id: 2,
+            },
+            {
+              name: "中心评估",
+              priority: "P3",
+              status: "手术评估",
+              display: true,
+              id: 3,
+            },
+            {
+              name: "专科评估",
+              priority: "P3",
+              status: "手术评估",
+              display: true,
+              id: 4,
+            },
+            {
+              name: "麻醉复苏评估",
+              priority: "P1",
+              status: "手术评估",
+              display: true,
+              id: 12,
+            },
+          ],
+          id: 1,
+        },
+        {
+          name: "手术预约",
+          list: [
+            {
+              name: "手术预约",
+              priority: "P1",
+              status: "手术预约",
+              display: true,
+              id: 5,
+            },
+          ],
+          id: 2,
+        },
+        {
+          name: "手术排程",
+          list: [
+            {
+              name: "手术排程",
+              priority: "P3",
+              status: "手术排程",
+              display: true,
+              id: 6,
+            },
+          ],
+          id: 3,
+        },
+        {
+          name: "入科",
+          list: [
+            {
+              name: "入科",
+              priority: "P0",
+              status: "入科",
+              display: true,
+              id: 7,
+            },
+          ],
+          id: 4,
+        },
+        {
+          name: "出科",
+          list: [
+            {
+              name: "出科",
+              priority: "P1",
+              status: "出科",
+              display: true,
+              id: 8,
+            },
+          ],
+          id: 5,
+        },
+        {
+          name: "办理出院",
+          list: [
+            {
+              name: "出院",
+              priority: "P1",
+              status: "办理出院",
+              display: true,
+              id: 9,
+            },
+          ],
+          id: 6,
+        },
+        {
+          name: "随访",
+          list: [
+            {
+              name: "中心随访",
+              priority: "P1",
+              status: "随访",
+              display: true,
+              id: 10,
+            },
+            {
+              name: "专科随访",
+              priority: "P1",
+              status: "随访",
+              display: true,
+              id: 11,
+            },
+          ],
+          id: 7,
+        },
+      ];
     },
   },
 };
