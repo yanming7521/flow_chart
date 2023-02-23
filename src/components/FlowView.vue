@@ -16,14 +16,14 @@
       <div class="e-title">创建新任务 :</div>
       <div class="edit-item">
         <div class="task-card" @click="taskVisible = true">
-          <div class="task-title">点击添加新任务</div>
+          <div class="task-title" style="padding: 0 10px">点击添加新任务</div>
         </div>
       </div>
     </div>
     <el-dialog
       title="设置新节点"
       :visible.sync="dialogFormVisible"
-      width="26%"
+      width="400px"
       custom-class="jd"
     >
       <el-form :model="jdform">
@@ -50,7 +50,7 @@
     <el-dialog
       title="设置新任务"
       :visible.sync="taskVisible"
-      width="26%"
+      width="400px"
       custom-class="jd"
     >
       <el-form :model="form">
@@ -100,6 +100,10 @@
             <div class="card-column-header">
               <span class="column-drag-handle">&#x2630;</span>
               {{ column.name }}
+              <span
+                class="el-icon-error delete"
+                @click="deleteJD(column)"
+              ></span>
             </div>
             <div
               class="arrow el-icon-right"
@@ -116,7 +120,13 @@
             >
               <Draggable v-for="task in column.list" :key="task.id">
                 <div class="task-card">
-                  <div class="task-title">{{ task.name }}</div>
+                  <div class="task-title">
+                    {{ task.name
+                    }}<span
+                      class="el-icon-close delete pos"
+                      @click="deletetask(column, task)"
+                    ></span>
+                  </div>
                 </div>
               </Draggable>
             </Container>
@@ -315,6 +325,44 @@ export default {
     // console.log("mounted", this.taskColumnList);
   },
   methods: {
+    // 删除任务
+    deletetask(node, item) {
+      let cList = node.list;
+      let newCList = [];
+      cList.map((it) => {
+        if (it.id !== item.id) {
+          newCList.push(it);
+        }
+      });
+      this.$message({
+        showClose: true,
+        message: "删除成功",
+        offset: 80,
+        type: "success",
+      });
+      setTimeout(() => {
+        this.taskColumnList.find((p) => p.id === node.id).list = newCList;
+      }, 300);
+    },
+    // 删除节点
+    deleteJD(item) {
+      let oldList = this.taskColumnList;
+      let newList = [];
+      oldList.map((it) => {
+        if (it.id !== item.id) {
+          newList.push(it);
+        }
+      });
+      this.$message({
+        showClose: true,
+        message: "删除成功",
+        offset: 80,
+        type: "success",
+      });
+      setTimeout(() => {
+        this.taskColumnList = newList;
+      }, 300);
+    },
     // 添加任务
     addtask(form) {
       let temp = {
@@ -326,6 +374,12 @@ export default {
       };
       this.taskColumnList.find((p) => p.id === form.id).list.push(temp);
       console.log("addtask--添加任务", this.taskColumnList);
+      this.$message({
+        showClose: true,
+        message: "添加成功",
+        offset: 80,
+        type: "success",
+      });
       this.form = [];
     },
     // 添加节点
@@ -333,6 +387,12 @@ export default {
       let id = this.taskColumnList.length + 1;
       this.taskColumnList.push({ name: form.name, list: [], id: id });
       console.log("addjd--添加节点");
+      this.$message({
+        showClose: true,
+        message: "添加成功",
+        offset: 80,
+        type: "success",
+      });
       this.jdform = [];
     },
     // 更新节点
@@ -366,144 +426,158 @@ export default {
       let taskColumnListFile = JSON.stringify(this.taskColumnList);
       console.log("taskColumnListFile", taskColumnListFile);
       const blob = new Blob([taskColumnListFile], { type: "application/json" });
+      this.$message({
+        showClose: true,
+        message: "开始下载",
+        offset: 80,
+        type: "success",
+      });
       FileSaver.saveAs(blob, `flowPath.json`);
     },
     // 重置&初始化
     initialization() {
-      this.taskColumnList = [
-        {
-          name: "入院登记",
-          list: [
-            {
-              name: "入院登记",
-              priority: "P1",
-              status: "入院登记",
-              display: true,
-              id: 1,
-            },
-          ],
-          id: 0,
-        },
-        {
-          name: "手术评估",
-          list: [
-            {
-              name: "麻醉评估",
-              priority: "P3",
-              status: "手术评估",
-              display: true,
-              id: 2,
-            },
-            {
-              name: "中心评估",
-              priority: "P3",
-              status: "手术评估",
-              display: true,
-              id: 3,
-            },
-            {
-              name: "专科评估",
-              priority: "P3",
-              status: "手术评估",
-              display: true,
-              id: 4,
-            },
-            {
-              name: "麻醉复苏评估",
-              priority: "P1",
-              status: "手术评估",
-              display: true,
-              id: 12,
-            },
-          ],
-          id: 1,
-        },
-        {
-          name: "手术预约",
-          list: [
-            {
-              name: "手术预约",
-              priority: "P1",
-              status: "手术预约",
-              display: true,
-              id: 5,
-            },
-          ],
-          id: 2,
-        },
-        {
-          name: "手术排程",
-          list: [
-            {
-              name: "手术排程",
-              priority: "P3",
-              status: "手术排程",
-              display: true,
-              id: 6,
-            },
-          ],
-          id: 3,
-        },
-        {
-          name: "入科",
-          list: [
-            {
-              name: "入科",
-              priority: "P0",
-              status: "入科",
-              display: true,
-              id: 7,
-            },
-          ],
-          id: 4,
-        },
-        {
-          name: "出科",
-          list: [
-            {
-              name: "出科",
-              priority: "P1",
-              status: "出科",
-              display: true,
-              id: 8,
-            },
-          ],
-          id: 5,
-        },
-        {
-          name: "办理出院",
-          list: [
-            {
-              name: "出院",
-              priority: "P1",
-              status: "办理出院",
-              display: true,
-              id: 9,
-            },
-          ],
-          id: 6,
-        },
-        {
-          name: "随访",
-          list: [
-            {
-              name: "中心随访",
-              priority: "P1",
-              status: "随访",
-              display: true,
-              id: 10,
-            },
-            {
-              name: "专科随访",
-              priority: "P1",
-              status: "随访",
-              display: true,
-              id: 11,
-            },
-          ],
-          id: 7,
-        },
-      ];
+      this.$message({
+        showClose: true,
+        message: "重置成功",
+        offset: 80,
+        type: "success",
+      });
+      setTimeout(() => {
+        this.taskColumnList = [
+          {
+            name: "入院登记",
+            list: [
+              {
+                name: "入院登记",
+                priority: "P1",
+                status: "入院登记",
+                display: true,
+                id: 1,
+              },
+            ],
+            id: 0,
+          },
+          {
+            name: "手术评估",
+            list: [
+              {
+                name: "麻醉评估",
+                priority: "P3",
+                status: "手术评估",
+                display: true,
+                id: 2,
+              },
+              {
+                name: "中心评估",
+                priority: "P3",
+                status: "手术评估",
+                display: true,
+                id: 3,
+              },
+              {
+                name: "专科评估",
+                priority: "P3",
+                status: "手术评估",
+                display: true,
+                id: 4,
+              },
+              {
+                name: "麻醉复苏评估",
+                priority: "P1",
+                status: "手术评估",
+                display: true,
+                id: 12,
+              },
+            ],
+            id: 1,
+          },
+          {
+            name: "手术预约",
+            list: [
+              {
+                name: "手术预约",
+                priority: "P1",
+                status: "手术预约",
+                display: true,
+                id: 5,
+              },
+            ],
+            id: 2,
+          },
+          {
+            name: "手术排程",
+            list: [
+              {
+                name: "手术排程",
+                priority: "P3",
+                status: "手术排程",
+                display: true,
+                id: 6,
+              },
+            ],
+            id: 3,
+          },
+          {
+            name: "入科",
+            list: [
+              {
+                name: "入科",
+                priority: "P0",
+                status: "入科",
+                display: true,
+                id: 7,
+              },
+            ],
+            id: 4,
+          },
+          {
+            name: "出科",
+            list: [
+              {
+                name: "出科",
+                priority: "P1",
+                status: "出科",
+                display: true,
+                id: 8,
+              },
+            ],
+            id: 5,
+          },
+          {
+            name: "办理出院",
+            list: [
+              {
+                name: "出院",
+                priority: "P1",
+                status: "办理出院",
+                display: true,
+                id: 9,
+              },
+            ],
+            id: 6,
+          },
+          {
+            name: "随访",
+            list: [
+              {
+                name: "中心随访",
+                priority: "P1",
+                status: "随访",
+                display: true,
+                id: 10,
+              },
+              {
+                name: "专科随访",
+                priority: "P1",
+                status: "随访",
+                display: true,
+                id: 11,
+              },
+            ],
+            id: 7,
+          },
+        ];
+      }, 300);
     },
   },
 };
@@ -516,6 +590,7 @@ export default {
   padding: 15px;
   background: #409eff;
   color: #edeff2;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 .title h2 {
   color: #edeff2;
@@ -526,7 +601,6 @@ export default {
   font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Helvetica,
     sans-serif;
   line-height: 1.45;
-  /* color: rgba(0, 0, 0, 0.65); */
 }
 .card-scene {
   user-select: none;
@@ -543,7 +617,7 @@ export default {
 .card-container {
   display: flex;
   flex-direction: column;
-  min-width: 140px;
+  min-width: 150px;
   border-radius: 12px;
   background-color: #edeff2;
   margin-right: 50px;
@@ -567,6 +641,7 @@ export default {
   height: 50px;
   margin: 0 16px;
   align-items: center;
+  justify-content: space-between;
   flex-shrink: 0;
   font-weight: 500;
   font-size: 16px;
@@ -582,7 +657,7 @@ export default {
 .task-card {
   margin: 10px;
   background-color: white;
-  padding: 15px 10px;
+  padding: 15px 0;
   border-radius: 8px;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.12);
   cursor: pointer;
@@ -593,7 +668,13 @@ export default {
 .task-title {
   color: #333333;
   font-size: 14px;
-  margin-right: 10px;
+  /* margin-right: 10px; */
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  justify-content: center;
+  height: 100%;
 }
 .task-priority {
   width: 60px;
@@ -642,5 +723,8 @@ export default {
   width: 60%;
   display: flex;
   justify-content: flex-end;
+}
+.delete {
+  margin-left: 10px;
 }
 </style>
