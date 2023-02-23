@@ -370,7 +370,9 @@ export default {
         priority: "P1",
         status: this.taskColumnList.find((p) => p.id === form.id).name,
         display: true,
-        id: form.id,
+        id: this.taskColumnList.find((p) => p.id === form.id).list.length
+          ? this.taskColumnList.find((p) => p.id === form.id).list.length
+          : 0,
       };
       this.taskColumnList.find((p) => p.id === form.id).list.push(temp);
       console.log("addtask--添加任务", this.taskColumnList);
