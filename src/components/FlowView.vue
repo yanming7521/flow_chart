@@ -312,9 +312,6 @@ export default {
   },
   mounted() {
     console.log("mounted", this.taskColumnList);
-    // this.taskColumnList = require("@/jsons/flowPath.json")
-    //   ? require("@/jsons/flowPath.json")
-    //   : this.taskColumnList;
   },
   methods: {
     addtask(form) {
@@ -326,7 +323,6 @@ export default {
         id: form.id,
       };
       this.taskColumnList.find((p) => p.id === form.id).list.push(temp);
-      // this.taskColumnList[form.id].list.push(temp);
       console.log("addtask--添加任务", this.taskColumnList);
     },
     addjd(form) {
@@ -343,7 +339,6 @@ export default {
       if (removedIndex !== null || addedIndex !== null) {
         const column = this.taskColumnList.find((p) => p.id === columnId);
         if (addedIndex !== null && payload) {
-          // 更新任务状态
           dropResult.payload = {
             ...payload,
             status: column.name,
@@ -356,13 +351,11 @@ export default {
     getCardPayload(columnId) {
       let index = (index) =>
         this.taskColumnList.find((p) => p.id === columnId).list[index];
-      // console.log("getCardPayload--初始化检查", index);
       return index;
     },
     sive() {
       let taskColumnListFile = JSON.stringify(this.taskColumnList);
       console.log("taskColumnListFile", taskColumnListFile);
-
       const blob = new Blob([taskColumnListFile], { type: "application/json" });
       FileSaver.saveAs(blob, `flowPath.json`);
     },
@@ -491,17 +484,16 @@ export default {
   margin: auto;
 }
 .foot {
-  width: 100%;
+  width: 90%;
   border-bottom: #edeff2 solid 1px;
   border-top: #edeff2 solid 1px;
-  position: absolute;
-  bottom: 100px;
+  margin-top: 20px;
   display: flex;
   justify-content: center;
 }
 .but {
   margin: 20px;
-  width: 40%;
+  width: 60%;
   display: flex;
   justify-content: flex-end;
 }
