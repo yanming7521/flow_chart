@@ -6,20 +6,35 @@
     <div class="edit">
       <div class="e-title">创建新节点 :</div>
       <div class="edit-type">
-        <div class="card-container" @click="dialogFormVisible = true">
-          <div class="card-column-header">
-            <span class="column-drag-handle">&#x2630;</span>
+        <div
+          id="Create-node"
+          class="card-container"
+          @click="dialogFormVisible = true"
+        >
+          <div class="card-column-header mouth">
+            <span class="column-drag-handle mouth">&#x2630;</span>
             点击添加节点
           </div>
         </div>
       </div>
       <div class="e-title">创建新任务 :</div>
       <div class="edit-item">
-        <div class="task-card" @click="taskVisible = true">
+        <div id="Create-task" class="task-card" @click="taskVisible = true">
           <div class="task-title" style="padding: 0 10px">点击添加新任务</div>
         </div>
       </div>
+      <div class="explain">
+        <el-button
+          type="warning"
+          plain
+          size="mini"
+          icon="el-icon-search"
+          @click="shepher($event)"
+          >使用说明</el-button
+        >
+      </div>
     </div>
+
     <el-dialog
       title="设置新节点"
       :visible.sync="dialogFormVisible"
@@ -92,11 +107,13 @@
     <div class="card-scene">
       <Container
         orientation="horizontal"
+        @drag-start="startD($event)"
         @drop="onColumnDrop($event)"
+        @drop-ready="ready($event)"
         drag-handle-selector=".column-drag-handle"
       >
         <Draggable v-for="(column, index) in taskColumnList" :key="column.name">
-          <div class="card-container">
+          <div class="card-container" :class="{ columnSh: index === 0 }">
             <div class="card-column-header">
               <span class="column-drag-handle">&#x2630;</span>
               {{ column.name }}
@@ -119,7 +136,7 @@
               class="draggable-container"
             >
               <Draggable v-for="task in column.list" :key="task.id">
-                <div class="task-card">
+                <div class="task-card" :class="{ taskSh: index === 0 }">
                   <div class="task-title">
                     {{ task.name
                     }}<span
@@ -134,12 +151,19 @@
         </Draggable>
       </Container>
     </div>
+    <div class="temp"></div>
     <div class="foot">
       <div class="but">
-        <el-button type="" style="margin-right: 40px" @click="initialization()"
+        <el-button
+          type=""
+          id="cz"
+          style="margin-right: 40px"
+          @click="initialization($event)"
           >重 置</el-button
         >
-        <el-button type="primary" @click="sive()">保 存</el-button>
+        <el-button id="save" type="primary" @click="sive($event)"
+          >保 存</el-button
+        >
       </div>
     </div>
   </div>
@@ -150,6 +174,8 @@
 import { Container, Draggable } from "vue-smooth-dnd";
 // 下载文件
 import FileSaver from "file-saver";
+// 引导
+import { shepherd } from "@wytxer/shepherd-vue";
 
 // 拖拽重构
 const applyDrag = (arr, dragResult) => {
@@ -172,136 +198,153 @@ export default {
     return {
       taskColumnList: [
         {
-          name: "入院登记",
+          name: "日间申请",
           list: [
             {
-              name: "入院登记",
-              priority: "P1",
-              status: "入院登记",
-              display: true,
-              id: 1,
+              name: "入院信息登记",
+              parent: "日间申请",
+              id: "1677201449285-0",
             },
           ],
-          id: 0,
+          id: 1677201449285,
         },
         {
-          name: "手术评估",
+          name: "日间登记",
+          list: [
+            {
+              name: "办理预住院",
+              parent: "日间登记",
+              id: "1677201467821-0",
+            },
+            {
+              name: "拟定手术",
+              parent: "日间登记",
+              id: "1677201467821-1",
+            },
+            {
+              name: "确认麻醉方式",
+              parent: "日间登记",
+              id: "1677201467821-2",
+            },
+            {
+              name: "补充登记信息",
+              parent: "日间登记",
+              id: "1677201467821-3",
+            },
+          ],
+          id: 1677201467821,
+        },
+        {
+          name: "院前检查",
+          list: [
+            {
+              name: "检验检查",
+              parent: "院前检查",
+              id: "1677201537277-0",
+            },
+          ],
+          id: 1677201537277,
+        },
+        {
+          name: "院前评估",
           list: [
             {
               name: "麻醉评估",
-              priority: "P3",
-              status: "手术评估",
-              display: true,
-              id: 2,
-            },
-            {
-              name: "中心评估",
-              priority: "P3",
-              status: "手术评估",
-              display: true,
-              id: 3,
+              parent: "院前评估",
+              id: "1677201553589-0",
             },
             {
               name: "专科评估",
-              priority: "P3",
-              status: "手术评估",
-              display: true,
-              id: 4,
+              parent: "院前评估",
+              id: "1677201553589-1",
             },
             {
-              name: "麻醉复苏评估",
-              priority: "P1",
-              status: "手术评估",
-              display: true,
-              id: 12,
+              name: "中心评估",
+              parent: "院前评估",
+              id: "1677201553589-2",
             },
           ],
-          id: 1,
+          id: 1677201553589,
         },
         {
-          name: "手术预约",
+          name: "术前宣教",
+          list: [
+            {
+              name: "用户宣教",
+              parent: "术前宣教",
+              id: "1677201594797-0",
+            },
+          ],
+          id: 1677201594797,
+        },
+        {
+          name: "手术安排",
           list: [
             {
               name: "手术预约",
-              priority: "P1",
-              status: "手术预约",
-              display: true,
-              id: 5,
+              parent: "手术安排",
+              id: "1677201614341-0",
             },
-          ],
-          id: 2,
-        },
-        {
-          name: "手术排程",
-          list: [
             {
               name: "手术排程",
-              priority: "P3",
-              status: "手术排程",
-              display: true,
-              id: 6,
+              parent: "手术安排",
+              id: "1677201614341-1",
+            },
+            {
+              name: "排程通知",
+              parent: "手术安排",
+              id: "1677201614341-2",
             },
           ],
-          id: 3,
+          id: 1677201614341,
         },
         {
-          name: "入科",
+          name: "出入科",
           list: [
+            {
+              name: "麻醉复苏评估",
+              parent: "出入科",
+              id: "1677201648021-2",
+            },
             {
               name: "入科",
-              priority: "P0",
-              status: "入科",
-              display: true,
-              id: 7,
+              parent: "出入科",
+              id: "1677201648021-1",
             },
-          ],
-          id: 4,
-        },
-        {
-          name: "出科",
-          list: [
             {
               name: "出科",
-              priority: "P1",
-              status: "出科",
-              display: true,
-              id: 8,
+              parent: "出入科",
+              id: "1677201648021-0",
             },
           ],
-          id: 5,
+          id: 1677201648021,
         },
         {
-          name: "办理出院",
+          name: "出院评估",
           list: [
             {
-              name: "出院",
-              priority: "P1",
-              status: "办理出院",
-              display: true,
-              id: 9,
+              name: "出院评估",
+              parent: "出院评估",
+              id: "1677201654933-0",
             },
           ],
-          id: 6,
+          id: 1677201654933,
         },
         {
           name: "随访",
           list: [
             {
-              name: "中心随访",
-              priority: "P1",
-              status: "随访",
-              display: true,
-              id: 10,
+              name: "专科随访",
+              parent: "随访",
+              id: "1677201670733-0",
             },
             {
-              name: "专科随访",
-              priority: "P1",
-              status: "随访",
-              display: true,
-              id: 11,
+              name: "中心随访",
+              parent: "随访",
+              id: "1677201670733-1",
             },
           ],
-          id: 7,
+          id: 1677201670733,
         },
       ],
       dropPlaceholderOptions: {
@@ -325,6 +368,100 @@ export default {
     // console.log("mounted", this.taskColumnList);
   },
   methods: {
+    // 引导
+    shepher(e) {
+      let target = e.target;
+      if (target.nodeName == "I" || target.nodeName == "SPAN") {
+        target = e.target.parentNode;
+      }
+      target.blur();
+      const driver = shepherd();
+      driver.addSteps([
+        {
+          attachTo: {
+            element: document.querySelector("#Create-node"),
+            on: "auto",
+          },
+          title: "创建新的任务节点",
+          text: "创建新的任务节点到零时节点区域",
+          buttons: [
+            {
+              action() {
+                return this.next();
+              },
+              text: "下一步",
+            },
+          ],
+        },
+        {
+          attachTo: {
+            element: document.querySelector("#Create-task"),
+            on: "auto",
+          },
+          title: "创建新的任务",
+          text: "创建新的任务到零时任务区域",
+        },
+
+        {
+          attachTo: {
+            element: document.querySelector(".temp"),
+            on: "auto",
+          },
+          title: "临时任务区",
+          text: "此处是已创建的临时节点和零时任务",
+        },
+        {
+          attachTo: {
+            element: document.querySelector(".columnSh"),
+            on: "auto",
+          },
+          title: "设计的流程节点",
+          text: "通过拖动 &#x2630; 来改变节点位置，也可以删除节点（将存放到零时节点区域）",
+        },
+        {
+          attachTo: {
+            element: document.querySelector(".taskSh"),
+            on: "auto",
+          },
+          title: "设计的节点任务",
+          text: "通过拖动改变任务顺序和所在节点，也可以删除任务（将存放到零时任务区域）",
+        },
+        {
+          attachTo: {
+            element: document.querySelector("#cz"),
+            on: "left",
+          },
+          title: "重置流程",
+          text: "初始化设计图到上次保存的状态",
+        },
+        {
+          attachTo: {
+            element: document.querySelector("#save"),
+            on: "right",
+          },
+          title: "保存流程",
+          text: "保存完整的任务流程",
+        },
+        {
+          attachTo: {
+            element: document.querySelector("#main-btn2"),
+            on: "auto",
+          },
+          title: "完成引导",
+          text: "恭喜您已经掌握全部技能！",
+          buttons: [
+            {
+              action() {
+                return this.cancel();
+              },
+              text: "完成",
+            },
+          ],
+        },
+      ]);
+
+      driver.start();
+    },
     // 删除任务
     deletetask(node, item) {
       let cList = node.list;
@@ -367,12 +504,12 @@ export default {
     addtask(form) {
       let temp = {
         name: form.name,
-        priority: "P1",
-        status: this.taskColumnList.find((p) => p.id === form.id).name,
-        display: true,
+        parent: this.taskColumnList.find((p) => p.id === form.id).name,
         id: this.taskColumnList.find((p) => p.id === form.id).list.length
-          ? this.taskColumnList.find((p) => p.id === form.id).list.length
-          : 0,
+          ? form.id +
+            "-" +
+            this.taskColumnList.find((p) => p.id === form.id).list.length
+          : form.id + "-" + 0,
       };
       this.taskColumnList.find((p) => p.id === form.id).list.push(temp);
       console.log("addtask--添加任务", this.taskColumnList);
@@ -382,24 +519,42 @@ export default {
         offset: 80,
         type: "success",
       });
-      this.form = [];
+      this.form = {};
     },
     // 添加节点
     addjd(form) {
-      let id = this.taskColumnList.length + 1;
+      let id = Date.now();
       this.taskColumnList.push({ name: form.name, list: [], id: id });
-      console.log("addjd--添加节点");
+      console.log("addjd--添加节点", this.taskColumnList);
       this.$message({
         showClose: true,
         message: "添加成功",
         offset: 80,
         type: "success",
       });
-      this.jdform = [];
+      this.jdform = {};
+    },
+    // 监听移动
+    startD(dragResult) {
+      console.log("startD--监听移动", dragResult);
+    },
+    ready(dragResult) {
+      // let it = dragResult.addedIndex;
+      // let newList = [];
+      // this.taskColumnList.forEach((item, index) => {
+      //   item.display = index == it + 1 ? false : true;
+      //   newList.push(item);
+      //   console.log(item, index, it);
+      // });
+      // this.taskColumnList = newList;
+      console.log("ready--监听移动", dragResult);
     },
     // 更新节点
     onColumnDrop(dropResult) {
       this.taskColumnList = applyDrag(this.taskColumnList, dropResult);
+      this.taskColumnList.forEach((item) => {
+        item.display = true;
+      });
       console.log("onColumnDrop--更新节点", this.taskColumnList);
     },
     // 更新任务
@@ -410,7 +565,7 @@ export default {
         if (addedIndex !== null && payload) {
           dropResult.payload = {
             ...payload,
-            status: column.name,
+            parent: column.name,
           };
         }
         column.list = applyDrag(column.list, dropResult);
@@ -424,7 +579,12 @@ export default {
       return index;
     },
     // 保存
-    sive() {
+    sive(e) {
+      let target = e.target;
+      if (target.nodeName == "I" || target.nodeName == "SPAN") {
+        target = e.target.parentNode;
+      }
+      target.blur();
       let taskColumnListFile = JSON.stringify(this.taskColumnList);
       console.log("taskColumnListFile", taskColumnListFile);
       const blob = new Blob([taskColumnListFile], { type: "application/json" });
@@ -437,7 +597,12 @@ export default {
       FileSaver.saveAs(blob, `flowPath.json`);
     },
     // 重置&初始化
-    initialization() {
+    initialization(e) {
+      let target = e.target;
+      if (target.nodeName == "I" || target.nodeName == "SPAN") {
+        target = e.target.parentNode;
+      }
+      target.blur();
       this.$message({
         showClose: true,
         message: "重置成功",
@@ -447,136 +612,153 @@ export default {
       setTimeout(() => {
         this.taskColumnList = [
           {
-            name: "入院登记",
+            name: "日间申请",
             list: [
               {
-                name: "入院登记",
-                priority: "P1",
-                status: "入院登记",
-                display: true,
-                id: 1,
+                name: "入院信息登记",
+                parent: "日间申请",
+                id: "1677201449285-0",
               },
             ],
-            id: 0,
+            id: 1677201449285,
           },
           {
-            name: "手术评估",
+            name: "日间登记",
+            list: [
+              {
+                name: "办理预住院",
+                parent: "日间登记",
+                id: "1677201467821-0",
+              },
+              {
+                name: "拟定手术",
+                parent: "日间登记",
+                id: "1677201467821-1",
+              },
+              {
+                name: "确认麻醉方式",
+                parent: "日间登记",
+                id: "1677201467821-2",
+              },
+              {
+                name: "补充登记信息",
+                parent: "日间登记",
+                id: "1677201467821-3",
+              },
+            ],
+            id: 1677201467821,
+          },
+          {
+            name: "院前检查",
+            list: [
+              {
+                name: "检验检查",
+                parent: "院前检查",
+                id: "1677201537277-0",
+              },
+            ],
+            id: 1677201537277,
+          },
+          {
+            name: "院前评估",
             list: [
               {
                 name: "麻醉评估",
-                priority: "P3",
-                status: "手术评估",
-                display: true,
-                id: 2,
-              },
-              {
-                name: "中心评估",
-                priority: "P3",
-                status: "手术评估",
-                display: true,
-                id: 3,
+                parent: "院前评估",
+                id: "1677201553589-0",
               },
               {
                 name: "专科评估",
-                priority: "P3",
-                status: "手术评估",
-                display: true,
-                id: 4,
+                parent: "院前评估",
+                id: "1677201553589-1",
               },
               {
-                name: "麻醉复苏评估",
-                priority: "P1",
-                status: "手术评估",
-                display: true,
-                id: 12,
+                name: "中心评估",
+                parent: "院前评估",
+                id: "1677201553589-2",
               },
             ],
-            id: 1,
+            id: 1677201553589,
           },
           {
-            name: "手术预约",
+            name: "术前宣教",
+            list: [
+              {
+                name: "用户宣教",
+                parent: "术前宣教",
+                id: "1677201594797-0",
+              },
+            ],
+            id: 1677201594797,
+          },
+          {
+            name: "手术安排",
             list: [
               {
                 name: "手术预约",
-                priority: "P1",
-                status: "手术预约",
-                display: true,
-                id: 5,
+                parent: "手术安排",
+                id: "1677201614341-0",
               },
-            ],
-            id: 2,
-          },
-          {
-            name: "手术排程",
-            list: [
               {
                 name: "手术排程",
-                priority: "P3",
-                status: "手术排程",
-                display: true,
-                id: 6,
+                parent: "手术安排",
+                id: "1677201614341-1",
+              },
+              {
+                name: "排程通知",
+                parent: "手术安排",
+                id: "1677201614341-2",
               },
             ],
-            id: 3,
+            id: 1677201614341,
           },
           {
-            name: "入科",
+            name: "出入科",
             list: [
+              {
+                name: "麻醉复苏评估",
+                parent: "出入科",
+                id: "1677201648021-2",
+              },
               {
                 name: "入科",
-                priority: "P0",
-                status: "入科",
-                display: true,
-                id: 7,
+                parent: "出入科",
+                id: "1677201648021-1",
               },
-            ],
-            id: 4,
-          },
-          {
-            name: "出科",
-            list: [
               {
                 name: "出科",
-                priority: "P1",
-                status: "出科",
-                display: true,
-                id: 8,
+                parent: "出入科",
+                id: "1677201648021-0",
               },
             ],
-            id: 5,
+            id: 1677201648021,
           },
           {
-            name: "办理出院",
+            name: "出院评估",
             list: [
               {
-                name: "出院",
-                priority: "P1",
-                status: "办理出院",
-                display: true,
-                id: 9,
+                name: "出院评估",
+                parent: "出院评估",
+                id: "1677201654933-0",
               },
             ],
-            id: 6,
+            id: 1677201654933,
           },
           {
             name: "随访",
             list: [
               {
-                name: "中心随访",
-                priority: "P1",
-                status: "随访",
-                display: true,
-                id: 10,
+                name: "专科随访",
+                parent: "随访",
+                id: "1677201670733-0",
               },
               {
-                name: "专科随访",
-                priority: "P1",
-                status: "随访",
-                display: true,
-                id: 11,
+                name: "中心随访",
+                parent: "随访",
+                id: "1677201670733-1",
               },
             ],
-            id: 7,
+            id: 1677201670733,
           },
         ];
       }, 300);
@@ -590,12 +772,13 @@ export default {
   /* width: 100%; */
   /* text-align: left; */
   padding: 15px;
-  background: #409eff;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(6px);
   color: #edeff2;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 .title h2 {
-  color: #edeff2;
+  color: #555;
 }
 * {
   margin: 0;
@@ -728,5 +911,17 @@ export default {
 }
 .delete {
   margin-left: 10px;
+}
+.mouth {
+  cursor: pointer !important;
+}
+.temp {
+  background: #f2f6fc;
+  min-height: 140px;
+  width: 100%;
+}
+.explain {
+  position: absolute;
+  right: 20px;
 }
 </style>
